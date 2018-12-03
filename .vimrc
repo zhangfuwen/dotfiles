@@ -7,12 +7,15 @@ Plug 'NLKNguyen/papercolor-theme'
 Plug 'scrooloose/nerdcommenter'
 Plug 'dyng/ctrlsf.vim'
 Plug 'scrooloose/nerdtree'
-Plug 'majutsusushi/tagbar'
+Plug 'majutsushi/tagbar'
 Plug 'Yggdroot/LeaderF',{'do':'./install.sh'}
 
-Plug 'Shougo/deoplete.nvim'
-Plug 'roxma/nvim-yarp'
-Plug 'roxma/vim-hug-neovim-rpc'
+if(has('python3'))
+	Plug 'Shougo/deoplete.nvim'
+	Plug 'roxma/nvim-yarp'
+	Plug 'roxma/vim-hug-neovim-rpc'
+	Plug 'Shougo/denite.nvim'
+endif
 
 " remember to run
 " pip3 install --user neovim
@@ -21,7 +24,6 @@ Plug 'dyng/ctrlsf.vim'
 Plug 'scrooloose/nerdcommenter'
 
 
-Plug 'Shougo/denite.nvim'
 
 Plug 'flazz/vim-colorschemes'
 
@@ -30,7 +32,7 @@ Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 
 Plug 'itchyny/vim-cursorword'
 Plug 'Yggdroot/indentLine'
-Plug 'derekwyatt/vim-switch',{'for':['c','cpp']}
+Plug 'derekwyatt/vim-fswitch',{'for':['c','cpp']}
 "Plug 'derekwyatt/vim-protodef',{'for':['c','cpp']}
 "Plug 'dbgx/lldb.nvim',{'on':'LLsession','do':':UpdateRemotePlugins'}
 Plug 'vim-scripts/DoxygenToolkit.vim',{'on':'Dox'}
@@ -108,19 +110,23 @@ set background=light
 set wildmenu " vim 自身命令行模式智能补全
 set mouse=a
 
-set pyx=3
-set pyxversion=3
+if(has('python3'))
+	set pyx=3
+	set pyxversion=3
+endif
 
 " 自动化 {{{
 " }}}
 
 
 " deoplete {{{
-let g:deoplete#enable_at_startup=1
-call deoplete#custom#option({
-            \'auto_complete_delay':200,
-            \'smart_case':v:true,
-            \})
+if(has('python3'))
+	let g:deoplete#enable_at_startup=1
+	call deoplete#custom#option({
+			\'auto_complete_delay':200,
+			\'smart_case':v:true,
+			\})
+endif
 " }}}
 
 " Leaderf {{{
@@ -209,7 +215,7 @@ nmap ta :FSHere<CR> "头文件切换
 
 colo PaperColor 
 let laststatus=2 "永远显示状态栏 
-let g:airline_powerline_fonts = 1 " 支持 powerline 字体 
+let g:airline_powerline_fonts = 0 " 支持 powerline 字体 
 let g:airline#extensions#tabline#enabled = 1 "显示窗口tab和buffer
 " let g:airline_theme="badcat"
 "AirlineTheme badcat
