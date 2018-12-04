@@ -28,7 +28,7 @@ endif
 Plug 'dyng/ctrlsf.vim'
 Plug 'scrooloose/nerdcommenter'
 
-
+Plug 'Shougo/echodoc.vim'
 
 Plug 'flazz/vim-colorschemes'
 
@@ -214,6 +214,14 @@ hi! clear SpellRare
 hi! SpellBad gui=undercurl guisp=red
 hi! SpellCap gui=undercurl guisp=blue
 hi! SpellRare gui=undercurl guisp=magenta
+" }}}
+
+
+" echo doc {{{
+set noshowmode
+" When you accept a completion for a function with <c-y>, 
+" echodoc will display the function signature in the command line 
+" and highlight the argument position your cursor is in.
 " }}}
 
 " KeyMaps {{{
