@@ -12,6 +12,17 @@ Plug 'Yggdroot/LeaderF',{'do':'./install.sh'}
 
 Plug 'ludovicchabant/vim-gutentags'
 
+" text objects
+" 它新定义的文本对象主要有：
+"   i, 和 a, ：参数对象，写代码一半在修改，现在可以用 di, 或 ci, 一次性删除/改写当前参数
+"   ii 和 ai ：缩进对象，同一个缩进层次的代码，可以用 vii 选中，dii / cii 删除或改写
+"   if 和 af ：函数对象，可以用 vif / dif / cif 来选中/删除/改写函数的内容
+Plug 'kana/vim-textobj-user'
+Plug 'kana/vim-textobj-indent'
+Plug 'kana/vim-textobj-syntax'
+Plug 'kana/vim-textobj-function', { 'for':['c', 'cpp', 'vim', 'java'] }
+Plug 'sgur/vim-textobj-parameter'
+
 " Asynchronous lint engine
 Plug 'w0rp/ale'
 
