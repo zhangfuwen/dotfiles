@@ -184,6 +184,9 @@ endfunction
 command GREP :execute 'vimgrep '.expand('<cword>').' '.expand('%')|:copen|:cc
 " }}}
 " ctags {{{
+" 少用 CTRL-] 直接在当前窗口里跳转到定义，
+" 多使用 CTRL-W ] 用新窗口打开并查看光标下符号的定义，
+" 或者 CTRL-W } 使用 preview 窗口预览光标下符号的定义
 set tags=./.tags;,.tags
 let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
 let g:gutentags_ctags_tagfile = '.tags'
@@ -274,11 +277,6 @@ nmap ta :FSHere<CR> "头文件切换
 " # CtrlSF
 " Press M to switch to quickfix window
 " }}}
-
-
-
-
-
 
 colo PaperColor 
 let laststatus=2 "永远显示状态栏 
