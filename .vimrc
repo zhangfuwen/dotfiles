@@ -141,7 +141,7 @@ if(has('python3'))
 	call deoplete#custom#option({
 			\'auto_complete_delay':200,
 			\'smart_case':v:true,
-			\})
+			})
 endif
 " }}}
 
