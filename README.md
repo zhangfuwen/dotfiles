@@ -15,3 +15,6 @@ cmake .. \
   
 ${SDK}/cmake/${Version}/bin/ninja
 ```
+
+# NDK 下载网址 
+https://developer.android.google.cn/ndk/downloads/
