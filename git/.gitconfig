@@ -1,0 +1,33 @@
+[user]
+	email = zhangfuwen@foxmail.com
+	name = zhangfuwen
+[core]
+	editor = vim
+	autocrlf = input
+[alias]
+    g = git
+    ga = add
+    gc = commit
+    gp = push
+    gl = pull
+    gs = status
+    gco = checkout
+    gcm = checkout main
+    gcb = checkout -b
+    gbr = branch
+    gbd = branch -d
+    gbD = branch -D
+    glog = log --oneline --graph --all
+    glo = log --oneline
+    gls = ls-files
+    gdiff = diff
+    gwdiff = diff --staged
+    gci = commit -m
+    gcp = commit -p
+    gpush = push origin HEAD
+    gup = pull --rebase
+    gfix = commit --amend
+    greset = reset --soft HEAD~1
+    grestore = restore --staged .
+    gclean = clean -fd
+    gstatus = status -s
