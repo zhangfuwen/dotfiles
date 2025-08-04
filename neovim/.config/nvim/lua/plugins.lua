@@ -61,7 +61,7 @@ call quickui#menu#install('&Tools', [
 \ ["----------\tCMake\t--------", '' ],
 \ ['&Generate','CMake'],
 \ ['&Build','CMakeBuild'],
-\ ['&Test','CTest'],
+\ ['Te&st','CTest'],
 \ ['&CTest!','CTest!'],
 \ ['&Info','CMakeInfo'],
 \ ['&Select Target', 'call Prompt_targets()'],
@@ -123,6 +123,7 @@ call quickui#menu#install('&Help', [
 \ ["&Lazy(plugin store)", 'Lazy', ''],
 \ ["&Mason(lsp store)", 'Mason', ''],
 \ ["&Keymaps", 'FzfLua keymaps', ''],
+\ ["&Dashboard", 'Dashboard', 'open dashboard'],
 \ ["&Cheatsheet", 'help index', ''],
 \ ['T&ips', 'help tips', ''],
 \ ['--',''],
@@ -152,14 +153,47 @@ return {
         dependencies = {
             { "williamboman/mason.nvim",          config = true },
             { "williamboman/mason-lspconfig.nvim" },
+            { 'hrsh7th/nvim-cmp' }, -- Completion engine
+            { 'hrsh7th/cmp-nvim-lsp' },
+            { 'hrsh7th/cmp-path' }, -- For file path completion
+            { 'hrsh7th/cmp-buffer' }, -- For buffer content completion
         },
         config = function()
             require("mason").setup()
             require("mason-lspconfig").setup({
                 ensure_installed = { "pyright", "clangd" }, -- customize as needed
             })
-            --      require("lspconfig").setup()
+            require("lspconfig").clangd.setup({
+                capabilities = require('cmp_nvim_lsp').default_capabilities(),
+                cmd = { 'clangd', '--background-index' },
+                settings = {
+                    clangd = {
+                        -- ✅ 启用 inlay hints
+                        inlayHints = {
+                            enabled = true,
+                            -- 可选：控制哪些类型提示显示
+                            showParameterNames = true,
+                            showTypeAnnotations = true,
+                            showVariableTypes = true,
+                            showFunctionReturnTypes = true,
+                            -- 控制是否显示默认值（如 `int x = 0;`）
+                            showDefaultValues = false,
+                        }
+                    }
+                }
+            })
         end,
+    },
+    {
+        'lvimuser/lsp-inlayhints.nvim',
+        event = "BufEnter",
+        opts = {
+            only_current_line = false,
+            highlight = "Comment", -- 可选：设置颜色
+            prefix = " ",
+            separator = " ",
+            align = "right", -- 对齐方式
+        },
     },
 
     ----------------------------------------------------------------------
@@ -198,9 +232,12 @@ return {
             -- Load NerdTree
             vim.g.NERDTreeShowHidden = 1
             vim.g.NERDTreeAutoCenter = 1
-            vim.g.NERDTreeQuitOnOpen = 1
+            vim.g.NERDTreeQuitOnOpen = 0
         end,
-        keys = { { "tf", "<cmd>NERDTreeToggle<cr>", desc = "Toggle NERDTree" } },
+        keys = {
+            { "tf", "<cmd>NERDTreeToggle<cr>", desc = "Toggle NERDTree" },
+            { "tn", "<cmd>NERDTreeToggle<cr>", desc = "Toggle NERDTree" },
+        },
     },
     {
         'tiagofumo/vim-nerdtree-syntax-highlight',
@@ -360,9 +397,9 @@ return {
     {
         "ibhagwan/fzf-lua",
         cmd = "FzfLua",
-        keys = { 
-            { "<leader>ff", "<cmd>FzfLua files<cr>", desc = "Find files" } ,
-            { "<C-h>", "<cmd>FzfLua files<cr>", desc = "Find files" } ,
+        keys = {
+            { "<leader>ff", "<cmd>FzfLua files<cr>", desc = "Find files" },
+            { "<C-h>",      "<cmd>FzfLua files<cr>", desc = "Find files" },
         },
         opts = {},
     },
@@ -641,7 +678,7 @@ return {
                     -- limit how many projects list, action when you press key or enter it will run this action.
                     -- action can be a function type, e.g.
                     -- action = func(path) vim.cmd('Telescope find_files cwd=' .. path) end
-                    project = { enable = true, limit = 8, icon = '📦', label = '', action = 'FzfLua files cwd='},
+                    project = { enable = true, limit = 8, icon = '📦', label = '', action = 'FzfLua files cwd=' },
                     mru = { enable = true, limit = 10, icon = '📄', label = '', cwd_only = false },
                     footer = {}, -- footer
                     change_to_vcs_root = true,
@@ -656,9 +693,9 @@ return {
                         max_items = 10,
                     },
                     shortcut = {
-                        { desc = "New File", key = "n", action = "ene" },
+                        { desc = "New File",     key = "n", action = "ene" },
                         { desc = "Recent Files", key = "r", action = "Telescope oldfiles" },
-                        { desc = "Find File", key = "f", action = "FzfLua files" },
+                        { desc = "Find File",    key = "f", action = "FzfLua files" },
                     },
                 },
             }

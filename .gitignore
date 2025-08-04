@@ -43,6 +43,7 @@ luac.out
 
 # after linking, packer.nvim and tpm will install their plugins in the following directories
 neovim/.config/nvim/plugin
+neovim/.config/nvim/lazy-lock.json
 tmux/.config/tmux/plugins
 
 **/.local/share/
