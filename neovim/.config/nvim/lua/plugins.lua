@@ -135,6 +135,143 @@ call quickui#menu#install('&Help', [
 ]]
 end
 
+-- ========================
+-- 🧩 1. 核心函数：运行选中代码
+-- ========================
+-- 📦 创建一个居中浮动窗口并写入内容
+-- 🎯 将指定缓冲区显示在居中浮动窗口中
+local function open_buffer_in_centered_float(bufnr, width, height)
+    -- ✅ 1. 获取屏幕尺寸
+    local screen_width = vim.opt.columns:get()
+    local screen_height = vim.opt.lines:get()
+
+    -- ✅ 2. 计算居中位置
+    local win_width = width or 60
+    local win_height = height or 15
+
+    --    local col = (screen_width - win_width) // 2
+    --    local row = (screen_height - win_height) // 2
+    local col = 30
+    local row = 40
+    print("screen_width ", screen_width)
+    print("screen_height ", screen_height)
+    print("win_width ", win_width)
+    print("win_height ", win_height)
+
+    -- ✅ 3. 创建浮动窗口
+    local opts = {
+        relative = "editor",
+        width = win_width,
+        height = win_height,
+        row = row,
+        col = col,
+        style = "minimal",  -- 可选："border", "minimal"
+        border = "rounded", -- 可选：none, single, double, rounded, solid, shadow
+        noautocmd = true,
+    }
+
+    local winid = vim.api.nvim_open_win(bufnr, true, opts)
+
+    -- ✅ 4. 设置窗口选项（可选）
+    vim.wo[winid].wrap = false
+    vim.wo[winid].cursorline = true
+    vim.wo[winid].signcolumn = "no"
+
+    -- ✅ 5. 自动关闭快捷键
+    vim.keymap.set("n", "<leader>c", function()
+        vim.api.nvim_win_close(winid, true)
+    end, { desc = "Close centered float", buffer = bufnr })
+end
+
+local function show_output_in_centered_float(content, title)
+    local new_buf = vim.api.nvim_create_buf(false, true)
+    --    vim.api.nvim_buf_set_name(new_buf, title or "Output")
+
+    -- ✅ 写入内容
+    local lines = type(content) == "string" and vim.split(content, '\n', true) or content
+    vim.api.nvim_buf_set_lines(new_buf, 0, -1, false, lines)
+
+    -- ✅ 设置文件类型
+    vim.api.nvim_buf_set_option(new_buf, "filetype", "sh")
+
+    -- ✅ 打开居中浮动窗口
+    open_buffer_in_centered_float(new_buf, 80, 25)
+end
+
+local function run_selected_code(lang, cmd_template)
+    local vstart = vim.fn.getpos("'<")
+
+    local vend = vim.fn.getpos("'>")
+
+    local line_start = vstart[2]
+    local line_end = vend[2]
+
+    -- or use api.nvim_buf_get_lines
+    local lines = vim.fn.getline(line_start, line_end)
+    if #lines == 0 then
+        print("No code selected")
+        return
+    end
+
+    --    local code = table.concat(lines, '\n')
+    local temp_file = vim.fn.tempname() .. "." .. lang
+
+    -- 写入临时文件
+    vim.fn.writefile(lines, temp_file)
+
+    -- 构建命令
+    local cmd = string.format(cmd_template, vim.fn.shellescape(temp_file))
+
+    -- 执行并获取输出
+    local output = vim.fn.system(cmd)
+
+    -- 清理临时文件
+    vim.fn.delete(temp_file)
+
+    show_output_in_centered_float(output, "Run Output")
+end
+-- ========================
+-- 🔤 2. 快捷键绑定
+-- ========================
+
+-- Python: <leader>p
+vim.keymap.set('v', '<leader>p', function()
+    run_selected_code("py", "python3 %s")
+end, {
+    desc = 'Run selected Python code',
+    silent = true,
+})
+
+-- Bash: <leader>b
+vim.keymap.set('v', '<leader>b', function()
+    run_selected_code("sh", "bash %s")
+end, {
+    desc = 'Run selected Bash code',
+    silent = true,
+})
+
+-- 自动检测语言：<leader>r
+vim.keymap.set('v', '<leader>r', function()
+    local filetype = vim.bo.filetype
+    local cmd_template
+
+    if filetype == "python" then
+        cmd_template = "python3 %s"
+    elseif filetype == "sh" or filetype == "bash" then
+        cmd_template = "bash %s"
+    else
+        print("Unsupported file type: " .. filetype)
+        return
+    end
+
+    run_selected_code(filetype, cmd_template)
+end, {
+    desc = 'Run selected code (auto-detect)',
+    silent = true,
+})
+
+
+
 return {
     ----------------------------------------------------------------------
     -- 🧩 PLUGIN MANAGER
@@ -153,15 +290,15 @@ return {
         dependencies = {
             { "williamboman/mason.nvim",          config = true },
             { "williamboman/mason-lspconfig.nvim" },
-            { 'hrsh7th/nvim-cmp' }, -- Completion engine
+            { 'hrsh7th/nvim-cmp' },   -- Completion engine
             { 'hrsh7th/cmp-nvim-lsp' },
-            { 'hrsh7th/cmp-path' }, -- For file path completion
+            { 'hrsh7th/cmp-path' },   -- For file path completion
             { 'hrsh7th/cmp-buffer' }, -- For buffer content completion
         },
         config = function()
             require("mason").setup()
             require("mason-lspconfig").setup({
-                ensure_installed = { "pyright", "clangd" }, -- customize as needed
+                ensure_installed = { "pyright", "clangd", "pylsp" }, -- customize as needed
             })
             require("lspconfig").clangd.setup({
                 capabilities = require('cmp_nvim_lsp').default_capabilities(),
@@ -181,6 +318,104 @@ return {
                         }
                     }
                 }
+            })
+            -- 👇 你的 LSP 配置（如 pyright/pylsp）放在这里
+            require("lspconfig").pyright.setup({
+                capabilities = require('cmp_nvim_lsp').default_capabilities(),
+                settings = {
+                    python = {
+                        analysis = {
+                            typeCheckingMode = "basic",
+                        },
+                    },
+                },
+            })
+
+            require("lspconfig").pylsp.setup({
+                capabilities = require('cmp_nvim_lsp').default_capabilities(),
+                settings = {
+                    pyls = {
+                        plugins = {
+                            pylint = { enabled = true },
+                            flake8 = { enabled = true },
+                        },
+                    },
+                },
+            })
+
+            -- ========================
+            -- 🔧 诊断窗口自动关闭 & 快捷键
+            -- ========================
+            -- vim.api.nvim_create_autocmd("DiagnosticHover", {
+            --     group = vim.api.nvim_create_augroup("AutoHideDiagnostic", { clear = true }),
+            --     callback = function()
+            --         vim.defer_fn(function()
+            --             vim.diagnostic.hide()
+            --         end, 5000)
+            --     end,
+            -- })
+            vim.api.nvim_create_autocmd("InsertLeave", {
+                group = vim.api.nvim_create_augroup("AutoHideDiagnostic", { clear = true }),
+                callback = function()
+                    vim.defer_fn(function()
+                        vim.diagnostic.hide()
+                    end, 5000)
+                end,
+            })
+
+            vim.keymap.set('n', '<leader>c', function()
+                vim.diagnostic.hide()
+            end, {
+                desc = 'Close diagnostic float',
+                silent = true,
+            })
+
+            -- 诊断显示设置
+            vim.diagnostic.config({
+                virtual_text = true,
+                signs = true,
+                update_in_insert = false,
+                severity_sort = true,
+            })
+
+            -- ========================
+            -- 🔧 将诊断信息推入 location list
+            -- ========================
+            vim.keymap.set('n', '<leader>l', function()
+                local bufnr = 0 -- 当前缓冲区
+                local diagnostics = vim.diagnostic.get(bufnr)
+
+                if #diagnostics == 0 then
+                    print("No diagnostics to show.")
+                    return
+                end
+                print("number of diagnostics " .. #diagnostics)
+
+                -- 构建 location list
+                local loclist = {}
+                for _, diag in ipairs(diagnostics) do
+                    local type = diag.severity == vim.diagnostic.severity.ERROR and "E"
+                        or diag.severity == vim.diagnostic.severity.WARN and "W"
+                        or diag.severity == vim.diagnostic.severity.INFO and "I"
+                        or "N"
+
+                    --                    print(vim.inspect(diag))
+                    table.insert(loclist, {
+                        filename = vim.api.nvim_buf_get_name(bufnr),
+                        lnum = diag.lnum, -- LSP 行号从 0 开始
+                        col = diag.col,   -- 列号也从 0 开始
+                        text = diag.message,
+                        type = type,
+                    })
+                    ::continue:: -- 标签
+                end
+
+                -- 写入 location list 并打开
+                vim.fn.setloclist(0, loclist)
+                vim.cmd('lopen')
+            end, {
+                desc = 'Open location list with diagnostics',
+                silent = true,
             })
         end,
     },
@@ -512,6 +747,35 @@ return {
         dependencies = {
             "tyru/open-browser.vim"
         }
+    },
+
+    -----------------------------------------------------------------------
+    --- run jupyter
+    ---
+    {
+        "geg2102/nvim-python-repl",
+        dependencies = "nvim-treesitter",
+        ft = { "python", "lua", "scala" },
+        config = function()
+            require("nvim-python-repl").setup({
+                execute_on_send = false,
+                vsplit = false,
+            })
+            -- vim.keymap.set("n", [your keymap], function() require('nvim-python-repl').send_statement_definition() end, { desc = "Send semantic unit to REPL"})
+
+            vim.keymap.set("v", '<leader>p', function() require('nvim-python-repl').send_visual_to_repl() end,
+                { desc = "Send visual selection to REPL" })
+
+            vim.keymap.set("n", '<leader>fp', function() require('nvim-python-repl').send_buffer_to_repl() end,
+                { desc = "Send entire buffer to REPL" })
+
+            vim.keymap.set("n", '<leader>e', function() require('nvim-python-repl').toggle_execute() end, { desc = "Automatically execute command in REPL after sent"})
+
+            --    vim.keymap.set("n", [your keymap], function() require('nvim-python-repl').toggle_vertical() end, { desc = "Create REPL in vertical or horizontal split"})
+
+            vim.keymap.set("n", '<leader>op', function() require('nvim-python-repl').open_repl() end,
+                { desc = "Opens the REPL in a window split" })
+        end
     },
 
     ----------------------------------------------------------------------
