@@ -23,8 +23,10 @@ for F in $DOTFILES_DIRS ; do
     # Remove previous links
     # NOTE: `stow` issues warning when working with absolute paths, so for now I am ignoring it
     # GHI: https://github.com/aspiers/stow/issues/65
-    stow -D --dotfiles --dir $DOTFILES --target $TARGET $F 2>/dev/null
+    stow -D --dotfiles --dir $DOTFILES --target $TARGET $F 2>/dev/null || echo "failed"
+    echo "~ Installing :: $F done1"
 
     # Installed new links
     stow --dotfiles --dir $DOTFILES --target $TARGET $F
+    echo "~ Installing :: $F done"
 done
