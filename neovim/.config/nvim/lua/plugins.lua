@@ -758,7 +758,7 @@ return {
         ft = { "python", "lua", "scala" },
         config = function()
             require("nvim-python-repl").setup({
-                execute_on_send = false,
+                execute_on_send = true,
                 vsplit = false,
             })
             -- vim.keymap.set("n", [your keymap], function() require('nvim-python-repl').send_statement_definition() end, { desc = "Send semantic unit to REPL"})
