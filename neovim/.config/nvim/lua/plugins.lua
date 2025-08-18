@@ -9,13 +9,14 @@ call quickui#menu#install('&Find', [
 \ ["Switch &Header/Source\tta", 'FSHere'],
 \ ["--", '' ],
 \ ["&Global search", 'FzfLua global' ],
-\ ["&Search in buffer", 'FzfLua blines' ],
-\ ["&Search in all buffer", 'FzfLua lines' ],
-\ ["&Search in folder(live_grep)", 'FzfLua live_grep' ],
+\ ["Search in &buffer", 'FzfLua blines' ],
+\ ["Search in all buffer", 'FzfLua lines' ],
+\ ["Search in folder(live_gre&p)", 'FzfLua live_grep' ],
 \ ["--", '' ],
 \ ["Find &Files", 'FzfLua files' ],
 \ ["Find &Symbols", 'FzfLua lsp_live_workspace_symbols' ],
 \ ["Find &References", 'FzfLua lsp_references' ],
+\ ["Open File &Explorer", 'normal <leader>fe' ],
 \ ["--", '' ],
 \ ["E&xit\tAlt+x", 'echo 6' ],
 \])
@@ -296,9 +297,24 @@ return {
             { 'hrsh7th/cmp-buffer' }, -- For buffer content completion
         },
         config = function()
+            vim.lsp.config('lua_ls', {
+                settings = {
+                    Lua = {
+                        runtime = {
+                            version = 'LuaJIT',
+                        },
+                        diagnostics = {
+                            globals = {
+                                'vim',
+                                'require',
+                            },
+                        },
+                    },
+                },
+            })
             require("mason").setup()
             require("mason-lspconfig").setup({
-                ensure_installed = { "pyright", "clangd", "pylsp" }, -- customize as needed
+                ensure_installed = { "pyright", "clangd", "pylsp", "lua_ls" }, -- customize as needed
             })
             require("lspconfig").clangd.setup({
                 capabilities = require('cmp_nvim_lsp').default_capabilities(),
@@ -342,7 +358,6 @@ return {
                     },
                 },
             })
-
             -- ========================
             -- 🔧 诊断窗口自动关闭 & 快捷键
             -- ========================
@@ -643,7 +658,68 @@ return {
         dependencies = { "nvim-lua/plenary.nvim" },
         cmd = "Telescope",
         config = function()
-            require("telescope").setup()
+            local project_actions = require("telescope._extensions.project.actions")
+            require("telescope").setup {
+                extensions = {
+                    project = {
+                        base_dirs = {
+                            '~/Code/github.com',
+                            { '~/dev/src2' },
+                            { '~/dev/src3',        max_depth = 4 },
+                            { path = '~/dev/src4' },
+                            { path = '~/dev/src5', max_depth = 2 },
+                        },
+                        ignore_missing_dirs = true, -- default: false
+                        hidden_files = false, -- default: false
+                        theme = "dropdown",
+                        order_by = "asc",
+                        search_by = "title",
+                        sync_with_nvim_tree = true, -- default false
+                        -- default for on_project_selected = find project files
+--                         on_project_selected = function(prompt_bufnr)
+--                             -- Do anything you want in here. For example:
+-- --                            project_actions.change_working_directory(prompt_bufnr, false)
+--                             vim.cmd("Telescope find_files cwd="..prompt_bufnr)
+-- --                            require("harpoon.ui").nav_file(1)
+--                         end,
+                        mappings = {
+                            n = {
+                                ['d'] = project_actions.delete_project,
+                                ['r'] = project_actions.rename_project,
+                                ['c'] = project_actions.add_project,
+                                ['C'] = project_actions.add_project_cwd,
+                                ['f'] = project_actions.find_project_files,
+                                ['b'] = project_actions.browse_project_files,
+                                ['s'] = project_actions.search_in_project_files,
+                                ['R'] = project_actions.recent_project_files,
+                                ['w'] = project_actions.change_working_directory,
+                                ['o'] = project_actions.next_cd_scope,
+                            },
+                            i = {
+                                ['<c-d>'] = project_actions.delete_project,
+                                ['<c-v>'] = project_actions.rename_project,
+                                ['<c-a>'] = project_actions.add_project,
+                                ['<c-A>'] = project_actions.add_project_cwd,
+                                ['<c-f>'] = project_actions.find_project_files,
+                                ['<c-b>'] = project_actions.browse_project_files,
+                                ['<c-s>'] = project_actions.search_in_project_files,
+                                ['<c-r>'] = project_actions.recent_project_files,
+                                ['<c-l>'] = project_actions.change_working_directory,
+                                ['<c-o>'] = project_actions.next_cd_scope,
+                            }
+                        }
+                    }
+                }
+            }
+        end
+    },
+    {
+        'nvim-telescope/telescope-project.nvim',
+        dependencies = {
+            'nvim-telescope/telescope.nvim',
+        },
+        config = function()
+            require 'telescope'.load_extension('project')
         end
     },
     {
@@ -769,7 +845,8 @@ return {
             vim.keymap.set("n", '<leader>fp', function() require('nvim-python-repl').send_buffer_to_repl() end,
                 { desc = "Send entire buffer to REPL" })
 
-            vim.keymap.set("n", '<leader>e', function() require('nvim-python-repl').toggle_execute() end, { desc = "Automatically execute command in REPL after sent"})
+            vim.keymap.set("n", '<leader>e', function() require('nvim-python-repl').toggle_execute() end,
+                { desc = "Automatically execute command in REPL after sent" })
 
             --    vim.keymap.set("n", [your keymap], function() require('nvim-python-repl').toggle_vertical() end, { desc = "Create REPL in vertical or horizontal split"})
 
@@ -958,6 +1035,7 @@ return {
                     },
                     shortcut = {
                         { desc = "New File",     key = "n", action = "ene" },
+                        { desc = "Projects",     key = "p", action = "Telescope project" },
                         { desc = "Recent Files", key = "r", action = "Telescope oldfiles" },
                         { desc = "Find File",    key = "f", action = "FzfLua files" },
                     },
@@ -965,7 +1043,95 @@ return {
             }
         end,
     },
-
+    {
+        "rolv-apneseth/tfm.nvim",
+        lazy = false,
+        opts = {
+            -- TFM to use
+            -- Possible choices: "ranger" | "nnn" | "lf" | "vifm" | "yazi" (default)
+            file_manager = "yazi",
+            -- Replace netrw entirely
+            -- Default: false
+            replace_netrw = true,
+            -- Enable creation of commands
+            -- Default: false
+            -- Commands:
+            --   Tfm: selected file(s) will be opened in the current window
+            --   TfmSplit: selected file(s) will be opened in a horizontal split
+            --   TfmVsplit: selected file(s) will be opened in a vertical split
+            --   TfmTabedit: selected file(s) will be opened in a new tab page
+            enable_cmds = true,
+            -- Custom keybindings only applied within the TFM buffer
+            -- Default: {}
+            keybindings = {
+                ["<ESC>"] = "q",
+                -- Override the open mode (i.e. vertical/horizontal split, new tab)
+                -- Tip: you can add an extra `<CR>` to the end of these to immediately open the selected file(s) (assuming the TFM uses `enter` to finalise selection)
+                ["<C-v>"] = "<C-\\><C-O>:lua require('tfm').set_next_open_mode(require('tfm').OPEN_MODE.vsplit)<CR>",
+                ["<C-x>"] = "<C-\\><C-O>:lua require('tfm').set_next_open_mode(require('tfm').OPEN_MODE.split)<CR>",
+                ["<C-t>"] = "<C-\\><C-O>:lua require('tfm').set_next_open_mode(require('tfm').OPEN_MODE.tabedit)<CR>",
+            },
+            -- Customise UI. The below options are the default
+            ui = {
+                border = "rounded",
+                height = 1,
+                width = 1,
+                x = 0.5,
+                y = 0.5,
+            },
+        },
+        keys = {
+            -- Make sure to change these keybindings to your preference,
+            -- and remove the ones you won't use
+            {
+                "<leader>fe",
+                ":Tfm<CR>",
+                desc = "TFM",
+            },
+            {
+                "<leader>mh",
+                ":TfmSplit<CR>",
+                desc = "TFM - horizontal split",
+            },
+            {
+                "<leader>mv",
+                ":TfmVsplit<CR>",
+                desc = "TFM - vertical split",
+            },
+            {
+                "<leader>mt",
+                ":TfmTabedit<CR>",
+                desc = "TFM - new tab",
+            },
+        },
+    },
+    {
+        'rcarriga/nvim-notify',
+        config = function()
+            vim.notify = require("notify")
+        end
+    },
+    -- {
+    --     'zhangfuwen/github.nvim',
+    --     config = function()
+    --         local github_nvim = require("github_nvim")
+    --         github_nvim.setup({})
+    --         require('telescope').load_extension('github_repos')
+    --
+    --         vim.keymap.set("n", "<leader>ghr", function()
+    --             vim.cmd("Telescope github_repos")
+    --         end, { desc = "List github repos", buffer = bufnr })
+    --
+    --         vim.keymap.set("n", "<leader>ghc", function()
+    --             require("github_nvim").clone()
+    --         end, { desc = "Clone a github repo", buffer = bufnr })
+    --
+    --         vim.keymap.set("n", "<leader>ghn", function()
+    --             require("github_nvim").create()
+    --         end, { desc = "New github repo", buffer = bufnr })
+    --     end
+    -- },
+    --
     {
         'folke/which-key.nvim',
         event = 'VeryLazy',

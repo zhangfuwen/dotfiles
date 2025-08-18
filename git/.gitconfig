@@ -31,3 +31,7 @@
     grestore = restore --staged .
     gclean = clean -fd
     gstatus = status -s
+[dotfiles]
+	managed = true
+[include]
+	path = /home/liutao/.gitconfig.extra
