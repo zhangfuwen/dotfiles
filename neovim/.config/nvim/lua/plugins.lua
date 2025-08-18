@@ -17,6 +17,7 @@ call quickui#menu#install('&Find', [
 \ ["Find &Symbols", 'FzfLua lsp_live_workspace_symbols' ],
 \ ["Find &References", 'FzfLua lsp_references' ],
 \ ["Open File &Explorer", 'normal <leader>fe' ],
+\ ["Find proje&cts", 'Telescope project' ],
 \ ["--", '' ],
 \ ["E&xit\tAlt+x", 'echo 6' ],
 \])
@@ -34,27 +35,27 @@ call quickui#menu#install('&View', [
 \ ["Open all fold\tzM", 'normal zM'],
 \ ["Close all fold\tzR", 'normal zR'],
 \])
-call quickui#menu#install('&Quickfix', [
-\ ["&Open\t copen", 'copen' ],
-\ ["&Close\t cclose", 'ccl' ],
-\ ["&Next\t cnext", 'cnext' ],
-\ ["&Prev\t cprev", 'cprev' ],
-\ ["&First\t cfirst", 'cfirst' ],
-\ ["&Last\t clast", 'clast' ],
-\ ["Olde&r\t colder", 'colder' ],
-\ ["Ne&wer\t cnewer", 'cnewer' ],
-\])
-
-call quickui#menu#install('&Locationlist', [
-\ [ "&Open\t lopen", 'lopen' ],
-\ [ "&Close\t lclose", 'lcl' ],
-\ [ "&Next\t lnext", 'lnext' ],
-\ [ "&Prev\t lprev", 'lprev' ],
-\ [ "&First\t lfirst", 'lfirst' ],
-\ [ "&Last\t llast", 'llast' ],
-\ [ "Olde&r\t lolder", 'lolder' ],
-\ [ "Ne&wer\t lnewer", 'lnewer' ],
-\ ])
+" call quickui#menu#install('&Quickfix', [
+" \ ["&Open\t copen", 'copen' ],
+" \ ["&Close\t cclose", 'ccl' ],
+" \ ["&Next\t cnext", 'cnext' ],
+" \ ["&Prev\t cprev", 'cprev' ],
+" \ ["&First\t cfirst", 'cfirst' ],
+" \ ["&Last\t clast", 'clast' ],
+" \ ["Olde&r\t colder", 'colder' ],
+" \ ["Ne&wer\t cnewer", 'cnewer' ],
+" \])
+"
+" call quickui#menu#install('&Locationlist', [
+" \ [ "&Open\t lopen", 'lopen' ],
+" \ [ "&Close\t lclose", 'lcl' ],
+" \ [ "&Next\t lnext", 'lnext' ],
+" \ [ "&Prev\t lprev", 'lprev' ],
+" \ [ "&First\t lfirst", 'lfirst' ],
+" \ [ "&Last\t llast", 'llast' ],
+" \ [ "Olde&r\t lolder", 'lolder' ],
+" \ [ "Ne&wer\t lnewer", 'lnewer' ],
+" \ ])
 
 let g:cmake_compile_commands=1
 let g:cmake_compile_commands_link='.'
@@ -664,10 +665,6 @@ return {
                     project = {
                         base_dirs = {
                             '~/Code/github.com',
-                            { '~/dev/src2' },
-                            { '~/dev/src3',        max_depth = 4 },
-                            { path = '~/dev/src4' },
-                            { path = '~/dev/src5', max_depth = 2 },
                         },
                         ignore_missing_dirs = true, -- default: false
                         hidden_files = false, -- default: false
@@ -683,18 +680,18 @@ return {
 -- --                            require("harpoon.ui").nav_file(1)
 --                         end,
                         mappings = {
-                            n = {
-                                ['d'] = project_actions.delete_project,
-                                ['r'] = project_actions.rename_project,
-                                ['c'] = project_actions.add_project,
-                                ['C'] = project_actions.add_project_cwd,
-                                ['f'] = project_actions.find_project_files,
-                                ['b'] = project_actions.browse_project_files,
-                                ['s'] = project_actions.search_in_project_files,
-                                ['R'] = project_actions.recent_project_files,
-                                ['w'] = project_actions.change_working_directory,
-                                ['o'] = project_actions.next_cd_scope,
-                            },
+                            -- n = {
+                            --     ['d'] = project_actions.delete_project,
+                            --     ['r'] = project_actions.rename_project,
+                            --     ['c'] = project_actions.add_project,
+                            --     ['C'] = project_actions.add_project_cwd,
+                            --     ['f'] = project_actions.find_project_files,
+                            --     ['b'] = project_actions.browse_project_files,
+                            --     ['s'] = project_actions.search_in_project_files,
+                            --     ['R'] = project_actions.recent_project_files,
+                            --     ['w'] = project_actions.change_working_directory,
+                            --     ['o'] = project_actions.next_cd_scope,
+                            -- },
                             i = {
                                 ['<c-d>'] = project_actions.delete_project,
                                 ['<c-v>'] = project_actions.rename_project,
@@ -1019,7 +1016,7 @@ return {
                     -- limit how many projects list, action when you press key or enter it will run this action.
                     -- action can be a function type, e.g.
                     -- action = func(path) vim.cmd('Telescope find_files cwd=' .. path) end
-                    project = { enable = true, limit = 8, icon = '📦', label = '', action = 'FzfLua files cwd=' },
+                    project = { enable = true, limit = 8, icon = '📦', label = '', action = 'Telescope find_files cwd=' },
                     mru = { enable = true, limit = 10, icon = '📄', label = '', cwd_only = false },
                     footer = {}, -- footer
                     change_to_vcs_root = true,
