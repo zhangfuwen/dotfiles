@@ -16,7 +16,7 @@ call quickui#menu#install('&Find', [
 \ ["Find &Files", 'FzfLua files' ],
 \ ["Find &Symbols", 'FzfLua lsp_live_workspace_symbols' ],
 \ ["Find &References", 'FzfLua lsp_references' ],
-\ ["Open File &Explorer", 'normal <leader>fe' ],
+\ ["Open File &Explorer\t<leader>fe", 'normal <leader>fe' ],
 \ ["Find proje&cts", 'Telescope project' ],
 \ ["--", '' ],
 \ ["E&xit\tAlt+x", 'echo 6' ],
@@ -252,8 +252,8 @@ end, {
     silent = true,
 })
 
--- 自动检测语言：<leader>r
-vim.keymap.set('v', '<leader>r', function()
+-- 自动检测语言：<leader>ra
+vim.keymap.set('v', '<leader>ra', function()
     local filetype = vim.bo.filetype
     local cmd_template
 
@@ -397,7 +397,7 @@ return {
             -- ========================
             -- 🔧 将诊断信息推入 location list
             -- ========================
-            vim.keymap.set('n', '<leader>l', function()
+            vim.keymap.set('n', '<leader>dl', function()
                 local bufnr = 0 -- 当前缓冲区
                 local diagnostics = vim.diagnostic.get(bufnr)
 
@@ -453,8 +453,8 @@ return {
     { "ryanoasis/vim-devicons",           event = "VeryLazy" },
     { "vim-airline/vim-airline",          event = "VeryLazy" },
     { "vim-airline/vim-airline-themes",   after = "vim-airline", event = "VeryLazy" },
---    { "NLKNguyen/papercolor-theme",       lazy = false },
---    { "flazz/vim-colorschemes",           lazy = false },
+    --    { "NLKNguyen/papercolor-theme",       lazy = false },
+    --    { "flazz/vim-colorschemes",           lazy = false },
     { "itchyny/vim-cursorword",           event = "BufReadPre" },
     { "octol/vim-cpp-enhanced-highlight", ft = "cpp" },
     { "Yggdroot/indentLine",              event = "BufReadPre" },
@@ -650,8 +650,13 @@ return {
         "ibhagwan/fzf-lua",
         cmd = "FzfLua",
         keys = {
-            { "<leader>ff", "<cmd>FzfLua files<cr>", desc = "Find files" },
-            { "<C-h>",      "<cmd>FzfLua files<cr>", desc = "Find files" },
+            { "<leader>ff", "<cmd>FzfLua files<cr>",      desc = "Find files" },
+            { "<leader>bf", "<cmd>FzfLua buffers<cr>",    desc = "Find buffers" },
+            { "<leader>bt", "<cmd>FzfLua btags<cr>",      desc = "Find buffer tags" },
+            { "<leader>mf", "<cmd>FzfLua marks<cr>",      desc = "Find marks" },
+            { "<leader>cf", "<cmd>FzfLua changes<cr>",    desc = "Find changes" },
+            { "<leader>jf", "<cmd>FzfLua jumps<cr>",      desc = "Find jumps" },
+            { "<leader>pf", "<cmd>Telescope project<cr>", desc = "Find projects" },
         },
         opts = {},
     },
@@ -661,26 +666,27 @@ return {
         dependencies = { "nvim-lua/plenary.nvim" },
         cmd = "Telescope",
         config = function()
---            local project_actions = require("telescope._extensions.project.actions")
+            --            local project_actions = require("telescope._extensions.project.actions")
             require("telescope").setup {
                 extensions = {
                     project = {
                         base_dirs = {
                             '~/Code/github.com',
+                            '~/Code/local',
                         },
                         ignore_missing_dirs = true, -- default: false
-                        hidden_files = false, -- default: false
+                        hidden_files = false,       -- default: false
                         theme = "dropdown",
                         order_by = "asc",
                         search_by = "title",
                         sync_with_nvim_tree = true, -- default false
                         -- default for on_project_selected = find project files
---                         on_project_selected = function(prompt_bufnr)
---                             -- Do anything you want in here. For example:
--- --                            project_actions.change_working_directory(prompt_bufnr, false)
---                             vim.cmd("Telescope find_files cwd="..prompt_bufnr)
--- --                            require("harpoon.ui").nav_file(1)
---                         end,
+                        --                         on_project_selected = function(prompt_bufnr)
+                        --                             -- Do anything you want in here. For example:
+                        -- --                            project_actions.change_working_directory(prompt_bufnr, false)
+                        --                             vim.cmd("Telescope find_files cwd="..prompt_bufnr)
+                        -- --                            require("harpoon.ui").nav_file(1)
+                        --                         end,
                         mappings = {
                             -- n = {
                             --     ['d'] = project_actions.delete_project,
@@ -719,7 +725,7 @@ return {
         },
         event = "VeryLazy",
         config = function()
---            require 'telescope'.load_extension('project')
+            --            require 'telescope'.load_extension('project')
         end
     },
     {
@@ -839,18 +845,18 @@ return {
             })
             -- vim.keymap.set("n", [your keymap], function() require('nvim-python-repl').send_statement_definition() end, { desc = "Send semantic unit to REPL"})
 
-            vim.keymap.set("v", '<leader>p', function() require('nvim-python-repl').send_visual_to_repl() end,
+            vim.keymap.set("v", '<leader>ev', function() require('nvim-python-repl').send_visual_to_repl() end,
                 { desc = "Send visual selection to REPL" })
 
-            vim.keymap.set("n", '<leader>fp', function() require('nvim-python-repl').send_buffer_to_repl() end,
+            vim.keymap.set("n", '<leader>eb', function() require('nvim-python-repl').send_buffer_to_repl() end,
                 { desc = "Send entire buffer to REPL" })
 
-            vim.keymap.set("n", '<leader>e', function() require('nvim-python-repl').toggle_execute() end,
-                { desc = "Automatically execute command in REPL after sent" })
+            -- vim.keymap.set("n", '<leader>ee', function() require('nvim-python-repl').toggle_execute() end,
+            --     { desc = "Automatically execute command in REPL after sent" })
 
             --    vim.keymap.set("n", [your keymap], function() require('nvim-python-repl').toggle_vertical() end, { desc = "Create REPL in vertical or horizontal split"})
 
-            vim.keymap.set("n", '<leader>op', function() require('nvim-python-repl').open_repl() end,
+            vim.keymap.set("n", '<leader>ep', function() require('nvim-python-repl').open_repl() end,
                 { desc = "Opens the REPL in a window split" })
         end
     },
@@ -874,7 +880,6 @@ return {
         config = function()
             local llm = require("llm")
             local tools = require("llm.tools")
-            print(vim.inspect(llm))
             llm.setup({
                 model = "qwen3-30b-a3b-instruct-2507",
                 url = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
@@ -1002,6 +1007,7 @@ return {
             }
             return {
                 theme = 'hyper',
+                shortcut_type = "letter",
                 config = {
                     header = {
                         ' ███╗   ██╗ ███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗',
@@ -1112,6 +1118,18 @@ return {
             vim.notify = require("notify")
         end
     },
+    {
+        'Exafunction/windsurf.vim',
+        config = function()
+            -- Change '<C-g>' here to any keycode you like.
+            vim.keymap.set('i', '<C-g>', function() return vim.fn['codeium#Accept']() end, { expr = true, silent = true })
+            vim.keymap.set('i', '<c-;>', function() return vim.fn['codeium#CycleCompletions'](1) end,
+                { expr = true, silent = true })
+            vim.keymap.set('i', '<c-,>', function() return vim.fn['codeium#CycleCompletions'](-1) end,
+                { expr = true, silent = true })
+            vim.keymap.set('i', '<c-x>', function() return vim.fn['codeium#Clear']() end, { expr = true, silent = true })
+        end
+    },
     -- {
     --     'zhangfuwen/github.nvim',
     --     config = function()
@@ -1156,14 +1174,47 @@ return {
             },
             -- Optional: show all keymaps in one place
             on_setup_done = function()
-                require('which-key').register({
-                    ['<leader>'] = { name = '+leader' },
-                    ['<leader>h'] = { name = '+help' },
-                    ['<leader>f'] = { name = '+file' },
-                    -- Add more as needed
-                })
+                -- require('which-key').add({
+                --     { "<leader>f", group = "+file" },
+                -- })
+                -- require('which-key').register({
+                --     ['<leader>'] = { name = '+leader' },
+                --     ['<leader>h'] = { name = '+help' },
+                --     ['<leader>f'] = { group = '+file' },
+                --     -- Add more as needed
+                -- })
             end,
         },
+        config = function()
+            local wk = require("which-key")
+            wk.add({
+                { "<leader>a",  group = "AI" }, -- group
+                {
+                    "<leader>b",
+                    group = "buffers",
+                    expand = function()
+                        return require("which-key.extras").expand.buf()
+                    end
+                },
+                { "<leader>c",  group = "changes/code" }, -- group
+                { "<leader>d",  group = "diagnostics" }, -- group
+                { "<leader>e",  group = "runner" }, -- group
+                { "<leader>f",  group = "file" }, -- group
+                { "<leader>t",  group = "text" }, -- group
+                { "<leader>m",  group = "marks" }, -- group
+                { "<leader>j",  group = "jumps" }, -- group
+                { "<leader>p",  group = "projects" }, -- group
+                { "<leader>w",  group = "window" }, -- group
+                -- {
+                --     -- Nested mappings are allowed and can be added in any order
+                --     -- Most attributes can be inherited or overridden on any level
+                --     -- There's no limit to the depth of nesting
+                --     mode = { "n", "v" },                          -- NORMAL and VISUAL mode
+                --     { "<leader>q", "<cmd>q<cr>", desc = "Quit" }, -- no need to specify mode since it's inherited
+                --     { "<leader>w", "<cmd>w<cr>", desc = "Write" },
+                -- }
+            })
+        end
     },
 
 }
