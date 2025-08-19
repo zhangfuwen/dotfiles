@@ -452,15 +452,15 @@ return {
     ----------------------------------------------------------------------
     { "ryanoasis/vim-devicons",           event = "VeryLazy" },
     { "vim-airline/vim-airline",          event = "VeryLazy" },
-    { "vim-airline/vim-airline-themes",   after = "vim-airline" },
-    { "NLKNguyen/papercolor-theme",       lazy = false },
-    { "flazz/vim-colorschemes",           lazy = false },
+    { "vim-airline/vim-airline-themes",   after = "vim-airline", event = "VeryLazy" },
+--    { "NLKNguyen/papercolor-theme",       lazy = false },
+--    { "flazz/vim-colorschemes",           lazy = false },
     { "itchyny/vim-cursorword",           event = "BufReadPre" },
     { "octol/vim-cpp-enhanced-highlight", ft = "cpp" },
     { "Yggdroot/indentLine",              event = "BufReadPre" },
     { -- it is a colorscheme, with better cousor line color
         'folke/tokyonight.nvim',
-        lazy = false,
+        lazy = true,
         priority = 1000,
         opts = {
             -- your options
@@ -492,6 +492,7 @@ return {
     },
     {
         'tiagofumo/vim-nerdtree-syntax-highlight',
+        event = "VeryLazy",
     },
     {
         "majutsushi/tagbar",
@@ -656,10 +657,11 @@ return {
     },
     {
         "nvim-telescope/telescope.nvim",
+        event = "VeryLazy",
         dependencies = { "nvim-lua/plenary.nvim" },
         cmd = "Telescope",
         config = function()
-            local project_actions = require("telescope._extensions.project.actions")
+--            local project_actions = require("telescope._extensions.project.actions")
             require("telescope").setup {
                 extensions = {
                     project = {
@@ -692,18 +694,18 @@ return {
                             --     ['w'] = project_actions.change_working_directory,
                             --     ['o'] = project_actions.next_cd_scope,
                             -- },
-                            i = {
-                                ['<c-d>'] = project_actions.delete_project,
-                                ['<c-v>'] = project_actions.rename_project,
-                                ['<c-a>'] = project_actions.add_project,
-                                ['<c-A>'] = project_actions.add_project_cwd,
-                                ['<c-f>'] = project_actions.find_project_files,
-                                ['<c-b>'] = project_actions.browse_project_files,
-                                ['<c-s>'] = project_actions.search_in_project_files,
-                                ['<c-r>'] = project_actions.recent_project_files,
-                                ['<c-l>'] = project_actions.change_working_directory,
-                                ['<c-o>'] = project_actions.next_cd_scope,
-                            }
+                            -- i = {
+                            --     ['<c-d>'] = project_actions.delete_project,
+                            --     ['<c-v>'] = project_actions.rename_project,
+                            --     ['<c-a>'] = project_actions.add_project,
+                            --     ['<c-A>'] = project_actions.add_project_cwd,
+                            --     ['<c-f>'] = project_actions.find_project_files,
+                            --     ['<c-b>'] = project_actions.browse_project_files,
+                            --     ['<c-s>'] = project_actions.search_in_project_files,
+                            --     ['<c-r>'] = project_actions.recent_project_files,
+                            --     ['<c-l>'] = project_actions.change_working_directory,
+                            --     ['<c-o>'] = project_actions.next_cd_scope,
+                            -- }
                         }
                     }
                 }
@@ -715,8 +717,9 @@ return {
         dependencies = {
             'nvim-telescope/telescope.nvim',
         },
+        event = "VeryLazy",
         config = function()
-            require 'telescope'.load_extension('project')
+--            require 'telescope'.load_extension('project')
         end
     },
     {
@@ -1021,7 +1024,7 @@ return {
                     footer = {}, -- footer
                     change_to_vcs_root = true,
                     week_header = {
-                        enable = true,
+                        -- enable = true,
                     },
                     projects = {
                         -- 自动获取 MRU 项目
@@ -1042,7 +1045,7 @@ return {
     },
     {
         "rolv-apneseth/tfm.nvim",
-        lazy = false,
+        lazy = true,
         opts = {
             -- TFM to use
             -- Possible choices: "ranger" | "nnn" | "lf" | "vifm" | "yazi" (default)
@@ -1104,6 +1107,7 @@ return {
     },
     {
         'rcarriga/nvim-notify',
+        event = 'VeryLazy',
         config = function()
             vim.notify = require("notify")
         end
