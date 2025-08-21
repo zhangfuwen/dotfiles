@@ -282,6 +282,11 @@ return {
         "folke/lazy.nvim",
         version = false, -- auto-update
     },
+    {
+        "alex-popov-tech/store.nvim",
+        dependencies = { "OXY2DEV/markview.nvim" },
+        cmd = "Store"
+    },
 
     ----------------------------------------------------------------------
     -- 🌐 LSP & LANGUAGE TOOLS
@@ -1196,15 +1201,16 @@ return {
                         return require("which-key.extras").expand.buf()
                     end
                 },
-                { "<leader>c",  group = "changes/code" }, -- group
-                { "<leader>d",  group = "diagnostics" }, -- group
-                { "<leader>e",  group = "runner" }, -- group
-                { "<leader>f",  group = "file" }, -- group
-                { "<leader>t",  group = "text" }, -- group
-                { "<leader>m",  group = "marks" }, -- group
-                { "<leader>j",  group = "jumps" }, -- group
-                { "<leader>p",  group = "projects" }, -- group
-                { "<leader>w",  group = "window" }, -- group
+                { "<leader>c",  group = "changes/code" },                      -- group
+                { "<leader>cr", "<cmd>grn",            desc = "rename code" }, -- group
+                { "<leader>d",  group = "diagnostics" },                       -- group
+                { "<leader>e",  group = "runner" },                            -- group
+                { "<leader>f",  group = "file" },                              -- group
+                { "<leader>t",  group = "text" },                              -- group
+                { "<leader>m",  group = "marks" },                             -- group
+                { "<leader>j",  group = "jumps" },                             -- group
+                { "<leader>p",  group = "projects" },                          -- group
+                { "<leader>w",  group = "window" },                            -- group
                 -- {
                 --     -- Nested mappings are allowed and can be added in any order
                 --     -- Most attributes can be inherited or overridden on any level
