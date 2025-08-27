@@ -155,10 +155,10 @@ local function open_buffer_in_centered_float(bufnr, width, height)
     --    local row = (screen_height - win_height) // 2
     local col = 30
     local row = 40
-    print("screen_width ", screen_width)
-    print("screen_height ", screen_height)
-    print("win_width ", win_width)
-    print("win_height ", win_height)
+    -- print("screen_width ", screen_width)
+    -- print("screen_height ", screen_height)
+    -- print("win_width ", win_width)
+    -- print("win_height ", win_height)
 
     -- ✅ 3. 创建浮动窗口
     local opts = {
@@ -187,7 +187,10 @@ end
 
 local function show_output_in_centered_float(content, title)
     local new_buf = vim.api.nvim_create_buf(false, true)
-    --    vim.api.nvim_buf_set_name(new_buf, title or "Output")
+    --vim.api.nvim_buf_set_name(new_buf, "Output")
+    if content == nil or content == "" then
+        content = "No output"
+    end
 
     -- ✅ 写入内容
     local lines = type(content) == "string" and vim.split(content, '\n', true) or content
@@ -221,14 +224,23 @@ local function run_selected_code(lang, cmd_template)
     -- 写入临时文件
     vim.fn.writefile(lines, temp_file)
 
-    -- 构建命令
-    local cmd = string.format(cmd_template, vim.fn.shellescape(temp_file))
+    local output = ""
+    if lang == "lua" then
+        output = vim.cmd("luafile " .. temp_file)
+        if output ~= nil and output ~= "" then
+            output = vim.inspect(output)
+        end
+    else
+        -- 构建命令
+        local cmd = string.format(cmd_template, vim.fn.shellescape(temp_file))
 
-    -- 执行并获取输出
-    local output = vim.fn.system(cmd)
+        -- 执行并获取输出
+        output = vim.fn.system(cmd)
 
-    -- 清理临时文件
-    vim.fn.delete(temp_file)
+        -- 清理临时文件
+        vim.fn.delete(temp_file)
+    end
+
 
     show_output_in_centered_float(output, "Run Output")
 end
@@ -237,7 +249,7 @@ end
 -- ========================
 
 -- Python: <leader>p
-vim.keymap.set('v', '<leader>p', function()
+vim.keymap.set('v', '<leader>ep', function()
     run_selected_code("py", "python3 %s")
 end, {
     desc = 'Run selected Python code',
@@ -245,15 +257,23 @@ end, {
 })
 
 -- Bash: <leader>b
-vim.keymap.set('v', '<leader>b', function()
+vim.keymap.set('v', '<leader>eb', function()
     run_selected_code("sh", "bash %s")
 end, {
     desc = 'Run selected Bash code',
     silent = true,
 })
 
--- 自动检测语言：<leader>ra
-vim.keymap.set('v', '<leader>ra', function()
+-- Lua: <leader>er
+vim.keymap.set('v', '<leader>el', function()
+    run_selected_code("lua", "%s")
+end, {
+    desc = 'Run selected lua code',
+    silent = true,
+})
+
+-- 自动检测语言：
+vim.keymap.set('v', '<leader>ea', function()
     local filetype = vim.bo.filetype
     local cmd_template
 
@@ -885,7 +905,8 @@ return {
             vim.keymap.set("n", '<leader>eb', function() require('nvim-python-repl').send_buffer_to_repl() end,
                 { desc = "Send entire buffer to REPL" })
 
-            vim.keymap.set("n", '<leader>em', function() require('nvim-python-repl').send_markdown_codeblock_to_repl() end,
+            vim.keymap.set("n", '<leader>em',
+                function() require('nvim-python-repl').send_markdown_codeblock_to_repl() end,
                 { desc = "Send markdown codeblock to REPL" })
 
             -- vim.keymap.set("n", '<leader>ee', function() require('nvim-python-repl').toggle_execute() end,
@@ -1191,8 +1212,8 @@ return {
                         download_remote_images = true,
                         only_render_image_at_cursor = true,
                         only_render_image_at_cursor_mode = "popup", -- or "inline"
-                        floating_windows = false, -- if true, images will be rendered in floating markdown windows
-                        filetypes = { "markdown", "vimwiki" }, -- markdown extensions (ie. quarto) can go here
+                        floating_windows = false,                   -- if true, images will be rendered in floating markdown windows
+                        filetypes = { "markdown", "vimwiki" },      -- markdown extensions (ie. quarto) can go here
                     },
                     neorg = {
                         enabled = true,
@@ -1214,10 +1235,10 @@ return {
                 max_width_window_percentage = nil,
                 max_height_window_percentage = 50,
                 scale_factor = 1.0,
-                window_overlap_clear_enabled = false,                                 -- toggles images when windows are overlapped
+                window_overlap_clear_enabled = false,                                               -- toggles images when windows are overlapped
                 window_overlap_clear_ft_ignore = { "cmp_menu", "cmp_docs", "snacks_notif", "scrollview", "scrollview_sign" },
-                editor_only_render_when_focused = false,                              -- auto show/hide images when the editor gains/looses focus
-                tmux_show_only_in_active_window = false,                              -- auto show/hide images in the correct Tmux window (needs visual-activity off)
+                editor_only_render_when_focused = false,                                            -- auto show/hide images when the editor gains/looses focus
+                tmux_show_only_in_active_window = false,                                            -- auto show/hide images in the correct Tmux window (needs visual-activity off)
                 hijack_file_patterns = { "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.avif" }, -- render image files as images when opened
             })
         end
@@ -1244,6 +1265,11 @@ return {
     --     end
     -- },
     --
+    {
+        'v1nh1shungry/plantuml-preview.nvim',
+        keys = { { '<Leader>up', function() require('plantuml-preview').toggle() end }, desc = 'Preview plantuml' },
+        opts = {},
+    },
     {
         'folke/which-key.nvim',
         event = 'VeryLazy',
