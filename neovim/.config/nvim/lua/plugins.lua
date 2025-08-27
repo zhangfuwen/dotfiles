@@ -283,6 +283,23 @@ return {
         version = false, -- auto-update
     },
     {
+        "OXY2DEV/markview.nvim",
+        event = "BufReadPre",
+        opts = {},
+        config = function()
+            require("markview").setup({
+                markdown = {
+                    headings = {
+                        heading_2 = { icon_hl = "@markup.link", icon = "%d. " },
+                        heading_3 = { icon_hl = "@markup.link", icon = "%d.%d " },
+                        heading_4 = { icon_hl = "@markup.link", icon = "%d.%d.%d " }
+                    }
+                }
+            });
+        end
+
+    },
+    {
         "alex-popov-tech/store.nvim",
         dependencies = { "OXY2DEV/markview.nvim" },
         cmd = "Store"
@@ -656,7 +673,6 @@ return {
         cmd = "FzfLua",
         keys = {
             { "<leader>ff", "<cmd>FzfLua files<cr>",      desc = "Find files" },
-            { "<leader>bf", "<cmd>FzfLua buffers<cr>",    desc = "Find buffers" },
             { "<leader>bt", "<cmd>FzfLua btags<cr>",      desc = "Find buffer tags" },
             { "<leader>mf", "<cmd>FzfLua marks<cr>",      desc = "Find marks" },
             { "<leader>cf", "<cmd>FzfLua changes<cr>",    desc = "Find changes" },
@@ -673,6 +689,19 @@ return {
         config = function()
             --            local project_actions = require("telescope._extensions.project.actions")
             require("telescope").setup {
+                defaults = {
+                    prompt_position = "top", -- This moves the input box to the top
+                    selection_caret = "❯ ", -- Optional: nice-looking prompt symbol
+                    entry_prefix = "  ", -- Clean up entry appearance
+                    layout_config = {
+                        horizontal = {
+                            prompt_position = "top",
+                        },
+                        vertical = {
+                            prompt_position = "top",
+                        },
+                    },
+                },
                 extensions = {
                     project = {
                         base_dirs = {
@@ -842,7 +871,7 @@ return {
     {
         "geg2102/nvim-python-repl",
         dependencies = "nvim-treesitter/nvim-treesitter",
-        ft = { "python", "lua", "scala" },
+        ft = { "python", "lua", "scala", "markdown" },
         config = function()
             require("nvim-python-repl").setup({
                 execute_on_send = true,
@@ -855,6 +884,9 @@ return {
 
             vim.keymap.set("n", '<leader>eb', function() require('nvim-python-repl').send_buffer_to_repl() end,
                 { desc = "Send entire buffer to REPL" })
+
+            vim.keymap.set("n", '<leader>em', function() require('nvim-python-repl').send_markdown_codeblock_to_repl() end,
+                { desc = "Send markdown codeblock to REPL" })
 
             -- vim.keymap.set("n", '<leader>ee', function() require('nvim-python-repl').toggle_execute() end,
             --     { desc = "Automatically execute command in REPL after sent" })
@@ -1136,6 +1168,62 @@ return {
         end
     },
     -- {
+    --     "folke/snacks.nvim",
+    --     ---@type snacks.Config
+    --     opts = {
+    --         image = {
+    --             -- your image configuration comes here
+    --             -- or leave it empty to use the default settings
+    --             -- refer to the configuration section below
+    --         }
+    --     }
+    -- },
+    {
+        "3rd/image.nvim",
+        config = function()
+            require("image").setup({
+                backend = "ueberzug",
+                processor = "magick_rock", -- or "magick_rock"
+                integrations = {
+                    markdown = {
+                        enabled = true,
+                        clear_in_insert_mode = false,
+                        download_remote_images = true,
+                        only_render_image_at_cursor = true,
+                        only_render_image_at_cursor_mode = "popup", -- or "inline"
+                        floating_windows = false, -- if true, images will be rendered in floating markdown windows
+                        filetypes = { "markdown", "vimwiki" }, -- markdown extensions (ie. quarto) can go here
+                    },
+                    neorg = {
+                        enabled = true,
+                        filetypes = { "norg" },
+                    },
+                    typst = {
+                        enabled = true,
+                        filetypes = { "typst" },
+                    },
+                    html = {
+                        enabled = false,
+                    },
+                    css = {
+                        enabled = false,
+                    },
+                },
+                max_width = nil,
+                max_height = nil,
+                max_width_window_percentage = nil,
+                max_height_window_percentage = 50,
+                scale_factor = 1.0,
+                window_overlap_clear_enabled = false,                                 -- toggles images when windows are overlapped
+                window_overlap_clear_ft_ignore = { "cmp_menu", "cmp_docs", "snacks_notif", "scrollview", "scrollview_sign" },
+                editor_only_render_when_focused = false,                              -- auto show/hide images when the editor gains/looses focus
+                tmux_show_only_in_active_window = false,                              -- auto show/hide images in the correct Tmux window (needs visual-activity off)
+                hijack_file_patterns = { "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.avif" }, -- render image files as images when opened
+            })
+        end
+
+    },
+    -- {
     --     'zhangfuwen/github.nvim',
     --     config = function()
     --         local github_nvim = require("github_nvim")
@@ -1201,16 +1289,17 @@ return {
                         return require("which-key.extras").expand.buf()
                     end
                 },
-                { "<leader>c",  group = "changes/code" },                      -- group
-                { "<leader>cr", "<cmd>grn",            desc = "rename code" }, -- group
-                { "<leader>d",  group = "diagnostics" },                       -- group
-                { "<leader>e",  group = "runner" },                            -- group
-                { "<leader>f",  group = "file" },                              -- group
-                { "<leader>t",  group = "text" },                              -- group
-                { "<leader>m",  group = "marks" },                             -- group
-                { "<leader>j",  group = "jumps" },                             -- group
-                { "<leader>p",  group = "projects" },                          -- group
-                { "<leader>w",  group = "window" },                            -- group
+                { "<leader>bf", "<cmd>Telescope buffers<cr>", desc = "Find buffers" },
+                { "<leader>c",  group = "changes/code" },                             -- group
+                { "<leader>cr", "<cmd>grn",                   desc = "rename code" }, -- group
+                { "<leader>d",  group = "diagnostics" },                              -- group
+                { "<leader>e",  group = "runner" },                                   -- group
+                { "<leader>f",  group = "file" },                                     -- group
+                { "<leader>t",  group = "text" },                                     -- group
+                { "<leader>m",  group = "marks" },                                    -- group
+                { "<leader>j",  group = "jumps" },                                    -- group
+                { "<leader>p",  group = "projects" },                                 -- group
+                { "<leader>w",  group = "window" },                                   -- group
                 -- {
                 --     -- Nested mappings are allowed and can be added in any order
                 --     -- Most attributes can be inherited or overridden on any level
