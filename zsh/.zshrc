@@ -108,15 +108,27 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-export RUSTUP_HOME=/home/liutao/.rustup
-export CARGO_HOME=/home/liutao/.cargo
+export RUSTUP_HOME=$HOME/.rustup
+export CARGO_HOME=$HOME/.cargo
 export RUSTUP_UPDATE_ROOT=https://pkgs.d.xiaomi.net/artifactory/rustup-remote/rustup
 export RUSTUP_DIST_SERVER=https://pkgs.d.xiaomi.net/artifactory/rustup-remote
-PATH=/home/liutao/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Python39/Scripts/:/mnt/c/Python39/:/mnt/c/Python313/Scripts/:/mnt/c/Python313/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program\ Files/CorpLink/current/module/mdm/x64/policy/bin:/mnt/c/ProgramData/chocolatey/bin:/mnt/c/Program\ Files/Git/cmd:/mnt/c/Program\ Files/dotnet/:/mnt/c/Program\ Files/CMake/bin:/mnt/c/Program\ Files\ \(x86\)/Windows\ Kits/10/Windows\ Performance\ Toolkit/:/mnt/c/Program\ Files/Microsoft\ VS\ Code/bin:/mnt/c/Users/刘涛/AppData/Local/Microsoft/WindowsApps:/mnt/c/Program\ Files/JetBrains/CLion\ 2024\.3\.2/bin:/mnt/c/Users/刘涛/AppData/Local/Programs/Microsoft\ VS\ Code/bin:/mnt/c/Users/刘涛/AppData/Local/Programs/Ollama:/mnt/c/Program\ Files/Oracle/VirtualBox:/mnt/c/Users/刘涛/AppData/Local/Programs/Windsurf/bin:/home/liutao/bin
+PATH=$HOME/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Python39/Scripts/:/mnt/c/Python39/:/mnt/c/Python313/Scripts/:/mnt/c/Python313/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program\ Files/CorpLink/current/module/mdm/x64/policy/bin:/mnt/c/ProgramData/chocolatey/bin:/mnt/c/Program\ Files/Git/cmd:/mnt/c/Program\ Files/dotnet/:/mnt/c/Program\ Files/CMake/bin:/mnt/c/Program\ Files\ \(x86\)/Windows\ Kits/10/Windows\ Performance\ Toolkit/:/mnt/c/Program\ Files/Microsoft\ VS\ Code/bin:/mnt/c/Users/刘涛/AppData/Local/Microsoft/WindowsApps:/mnt/c/Program\ Files/JetBrains/CLion\ 2024\.3\.2/bin:/mnt/c/Users/刘涛/AppData/Local/Programs/Microsoft\ VS\ Code/bin:/mnt/c/Users/刘涛/AppData/Local/Programs/Ollama:/mnt/c/Program\ Files/Oracle/VirtualBox:/mnt/c/Users/刘涛/AppData/Local/Programs/Windsurf/bin:$HOME/bin
 EDITOR=vim
 export PATH=$PATH:/snap/bin
-export ANDROID_NDK_ROOT=/home/liutao/bin/android-ndk-r27c
-export ANDROID_NDK_HOME=/home/liutao/bin/android-ndk-r27c
+if [[ -n ANDROID_NDK_HOME ]]; then
+    # exists and not empty
+    echo "ANDROID_NDK_HOME: ${ANDROID_NDK_HOME}"
+else
+    export ANDROID_NDK_HOME="$HOME/bin/android-ndk-r27c"
+    echo "ANDROID_NDK_HOME: ${ANDROID_NDK_HOME}"
+fi
+if [[ -n ANDROID_NDK_ROOT ]]; then
+    # exists and not empty
+    echo "ANDROID_NDK_ROOT: ${ANDROID_NDK_ROOT}"
+else
+    export ANDROID_NDK_ROOT="$ROOT/bin/android-ndk-r27c"
+    echo "ANDROID_NDK_ROOT: ${ANDROID_NDK_ROOT}"
+fi
 export JAVA_HOME=/snap/openjdk/2220/jdk/
 export ANDROID_ADB_SERVER_PORT=5037
 alias vi=nvim
