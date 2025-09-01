@@ -1066,7 +1066,7 @@ return {
             return {
                 theme = 'hyper',
                 shortcut_type = "letter",
-                letter_list = "abcdeghijklmoqsuvwxyz",
+                letter_list = "abcdegimoqsuvwxyz",
                 config = {
                     header = {
                         ' ███╗   ██╗ ███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗',
