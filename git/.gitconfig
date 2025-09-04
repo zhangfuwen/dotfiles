@@ -35,3 +35,5 @@
 	managed = true
 [include]
 	path = /home/liutao/.gitconfig.extra
+[url "git@github.com:"]
+	insteadOf = https://github.com/

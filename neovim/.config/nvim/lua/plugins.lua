@@ -1245,27 +1245,30 @@ return {
         end
 
     },
-    -- {
-    --     'zhangfuwen/github.nvim',
-    --     config = function()
-    --         local github_nvim = require("github_nvim")
-    --         github_nvim.setup({})
-    --         require('telescope').load_extension('github_repos')
-    --
-    --         vim.keymap.set("n", "<leader>ghr", function()
-    --             vim.cmd("Telescope github_repos")
-    --         end, { desc = "List github repos", buffer = bufnr })
-    --
-    --         vim.keymap.set("n", "<leader>ghc", function()
-    --             require("github_nvim").clone()
-    --         end, { desc = "Clone a github repo", buffer = bufnr })
-    --
-    --         vim.keymap.set("n", "<leader>ghn", function()
-    --             require("github_nvim").create()
-    --         end, { desc = "New github repo", buffer = bufnr })
-    --     end
-    -- },
-    --
+    {
+        'zhangfuwen/github.nvim',
+        config = function()
+            local github_nvim = require("github_nvim")
+            github_nvim.setup({})
+            require('telescope').load_extension('github_repos')
+
+            vim.keymap.set("n", "<leader>ghr", function()
+                vim.cmd("Telescope github_repos")
+            end, { desc = "List github repos"})
+
+            vim.keymap.set("n", "<leader>ghc", function()
+                require("github_nvim").clone()
+            end, { desc = "Clone a github repo"})
+
+            vim.keymap.set("n", "<leader>ghn", function()
+                require("github_nvim").create()
+            end, { desc = "New github repo"})
+
+            vim.keymap.set("n", "<leader>ghr", function()
+                vim.cmd("Telescope github_repos")
+            end, { desc = "Open github remote repos"})
+        end
+    },
     {
         'v1nh1shungry/plantuml-preview.nvim',
         keys = { { '<Leader>up', function() require('plantuml-preview').toggle() end }, desc = 'Preview plantuml' },
