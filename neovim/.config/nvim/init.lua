@@ -93,7 +93,6 @@ vim.opt.cursorline = true
 -- if vim.fn.empty(vim.fn.stdpath('data') .. "/pack/packer/start/papercolor-theme/colors/PaperColor.vim") == 0 then
 --     vim.cmd('colo PaperColor')
 -- end
-    vim.cmd('colo tokyonight')
 
 -- 3.2 折叠设置
 vim.opt.foldenable = false
@@ -304,3 +303,4 @@ vim.cmd([[
     nnoremenu PopUp.TempTerminal :call quickui#terminal#open('bash', {'w':80, 'h':32, 'callback':'', 'title':'terminal'})<CR>
     nnoremenu PopUp.Close\ Terminal :bdelete!<CR>
     ]])
+vim.cmd [[ colorscheme tokyonight-moon ]]

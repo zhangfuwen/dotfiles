@@ -1,0 +1,23 @@
+# see https://github.com/sigoden/aichat/blob/main/config.example.yaml
+
+model: deepseek:deepseek-chat
+clients:
+- type: openai-compatible
+  name: ollama
+  #api_base: http://10.220.114.163:11434/v1
+  api_base: http://localhost:11434/v1
+  models:
+  - name: phi4-mini
+    system_prompt_prefix: you're a helpfull assistant.
+  - name: gemma3
+    system_prompt_prefix: you're a helpfull assistant.
+  - name: deepseek-r1
+    system_prompt_prefix: you're a helpfull assistant.
+- type: openai-compatible
+  name: deepseek
+  api_base: https://api.deepseek.com/v1 
+#  api_key: will get from environment variable DEEPSEEK_API_KEY
+  models:
+  - name: deepseek-chat
+    system_prompt_prefix: you're a helpfull assistant. try to be brief and to the point.
+  

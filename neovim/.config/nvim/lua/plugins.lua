@@ -137,6 +137,13 @@ call quickui#menu#install('&Help', [
 ]]
 end
 
+local function select_project()
+    require 'telescope'.extensions.project.project { display_type = 'full', hide_workspace = true }
+end
+vim.keymap.set("n", "<M-P>", function()
+    select_project()
+end, { desc = "select project", buffer = bufnr })
+
 -- ========================
 -- 🧩 1. 核心函数：运行选中代码
 -- ========================
@@ -307,12 +314,31 @@ return {
         event = "BufReadPre",
         opts = {},
         config = function()
+            --- Gets icon from a parsed heading item.
+            ---@param item markview.parsed.markdown.atx
+            ---@return string
+            local function get_icon(_, item)
+                if not item or not item.levels then
+                    return "";
+                end
+
+                local output = "◈ ";
+
+                for l, level in ipairs(item.levels) do
+                    if level ~= 0 then
+                        output = output .. level .. (l ~= #item.levels and "." or "");
+                    end
+                end
+
+                return output .. " ";
+            end
+
             require("markview").setup({
                 markdown = {
                     headings = {
-                        heading_2 = { icon_hl = "@markup.link", icon = "%d. " },
-                        heading_3 = { icon_hl = "@markup.link", icon = "%d.%d " },
-                        heading_4 = { icon_hl = "@markup.link", icon = "%d.%d.%d " }
+                        heading_1 = { icon_hl = "@markup.link", icon = get_icon },
+                        heading_2 = { icon_hl = "@markup.link", icon = get_icon },
+                        heading_3 = { icon_hl = "@markup.link", icon = get_icon }
                     }
                 }
             });
@@ -528,8 +554,9 @@ return {
             vim.g.NERDTreeQuitOnOpen = 0
         end,
         keys = {
-            { "tf", "<cmd>NERDTreeToggle<cr>", desc = "Toggle NERDTree" },
-            { "tn", "<cmd>NERDTreeToggle<cr>", desc = "Toggle NERDTree" },
+            { "tf",    "<cmd>NERDTreeToggle<cr>", desc = "Toggle NERDTree" },
+            { "tn",    "<cmd>NERDTreeToggle<cr>", desc = "Toggle NERDTree" },
+            { "<M-p>", "<cmd>NERDTreeToggle<cr>", desc = "Toggle NERDTree" },
         },
     },
     {
@@ -539,8 +566,11 @@ return {
     {
         "majutsushi/tagbar",
         cmd = "TagbarToggle",
-        keys = { { "tb", ":TagbarToggle<CR>", desc = "Toggle Tagbar" } },
-        keys = { { "tl", ":TagbarToggle<CR>", desc = "Toggle Tagbar" } },
+        keys = {
+            { "tl",    ":TagbarToggle<CR>",       desc = "Toggle Tagbar" },
+            { "<M-l>", "<cmd>TagbarToggle f<cr>", desc = "Toggle Tagbar" },
+            { "<M-L>", "<cmd>FzfLua btags<cr>",   desc = "Toggle Tagbar" },
+        },
     },
 
     ----------------------------------------------------------------------
@@ -706,6 +736,14 @@ return {
         event = "VeryLazy",
         dependencies = { "nvim-lua/plenary.nvim" },
         cmd = "Telescope",
+        keys = {
+            { "<M-f>", "<cmd>Telescope find_files<cr>",     desc = "Find files" },
+            { "<M-F>", "<cmd>Telescope live_grep<cr>",      desc = "Find text" },
+            { "<M-b>", "<cmd>Telescope buffers<cr>",        desc = "Find buffers" },
+            { "<M-h>", "<cmd>Telescope help_tags<cr>",      desc = "Find help" },
+            { "<M-g>", "<cmd>Telescope git_files<cr>",      desc = "Find git files" },
+            { "<M-r>", "<cmd>Telescope lsp_references<cr>", desc = "Find references" },
+        },
         config = function()
             --            local project_actions = require("telescope._extensions.project.actions")
             require("telescope").setup {
@@ -891,11 +929,16 @@ return {
     {
         "geg2102/nvim-python-repl",
         dependencies = "nvim-treesitter/nvim-treesitter",
-        ft = { "python", "lua", "scala", "markdown" },
+        ft = { "python", "lua", "scala", "markdown", "sh" },
         config = function()
             require("nvim-python-repl").setup({
                 execute_on_send = true,
+                prompt_spawn = false,
+                spawn_command = {
+                    bash = "zsh",
+                },
                 vsplit = false,
+                split_dir = 'below'
             })
             -- vim.keymap.set("n", [your keymap], function() require('nvim-python-repl').send_statement_definition() end, { desc = "Send semantic unit to REPL"})
 
@@ -913,8 +956,10 @@ return {
             --     { desc = "Automatically execute command in REPL after sent" })
 
             --    vim.keymap.set("n", [your keymap], function() require('nvim-python-repl').toggle_vertical() end, { desc = "Create REPL in vertical or horizontal split"})
-
             vim.keymap.set("n", '<leader>ep', function() require('nvim-python-repl').open_repl() end,
+                { desc = "Opens the REPL in a window split" })
+
+            vim.keymap.set({ 'n', 'v', 'i', 't' }, '<M-t>', function() require('nvim-python-repl').toggle_repl_win() end,
                 { desc = "Opens the REPL in a window split" })
         end
     },
