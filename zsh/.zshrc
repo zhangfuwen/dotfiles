@@ -139,3 +139,5 @@ for config_file in ~/.zsh.d/*.zsh; do
     [[ -f "$config_file" ]] && source "$config_file"
 done
 alias docker="podman"
+alias y="yazi"
+alias n='nautilus >/dev/null 2>&1 &'
