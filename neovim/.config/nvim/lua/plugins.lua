@@ -1252,8 +1252,8 @@ return {
         "3rd/image.nvim",
         config = function()
             require("image").setup({
-                backend = "ueberzug",
-                processor = "magick_rock", -- or "magick_rock"
+                backend = "kitty",
+                processor = "magick_cli", -- or "magick_rock"
                 integrations = {
                     markdown = {
                         enabled = true,
@@ -1338,7 +1338,7 @@ return {
             -- this file can contain specific instructions for your project
             instructions_file = "avante.md",
             -- for example
-            provider = "deepseek",
+            provider = "miko",
             providers = {
                 deepseek = {
                     __inherited_from = "openai",
@@ -1347,6 +1347,13 @@ return {
                     model = "deepseek-coder",
                     max_tokens = 8192,
                 },
+                miko = {
+                    __inherited_from = "openai",
+                    api_key_name = "MIKO_API_KEY",
+                    endpoint = "http://s-20250905103729-nscx9.kscn-tj5-cloudml.xiaomi.srv/v1",
+                    model = "qwen",
+                    max_tokens = 32768,
+                }
             },
         },
         dependencies = {

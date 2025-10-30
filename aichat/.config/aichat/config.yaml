@@ -1,6 +1,7 @@
 # see https://github.com/sigoden/aichat/blob/main/config.example.yaml
 
-model: deepseek:deepseek-chat
+#model: deepseek:deepseek-chat
+model: miko:qwen
 clients:
 - type: openai-compatible
   name: ollama
@@ -19,5 +20,11 @@ clients:
 #  api_key: will get from environment variable DEEPSEEK_API_KEY
   models:
   - name: deepseek-chat
+    system_prompt_prefix: you're a helpfull assistant. try to be brief and to the point.
+- type: openai-compatible
+  name: miko
+  api_base: http://s-20250905103729-nscx9.kscn-tj5-cloudml.xiaomi.srv/v1
+  models:
+  - name: qwen
     system_prompt_prefix: you're a helpfull assistant. try to be brief and to the point.
   
