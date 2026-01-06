@@ -388,7 +388,7 @@ return {
             require("mason-lspconfig").setup({
                 ensure_installed = { "pyright", "clangd", "pylsp", "lua_ls" }, -- customize as needed
             })
-            require("lspconfig").clangd.setup({
+            vim.lsp.config('clangd', {
                 capabilities = require('cmp_nvim_lsp').default_capabilities(),
                 cmd = { 'clangd', '--background-index' },
                 settings = {
@@ -408,7 +408,7 @@ return {
                 }
             })
             -- 👇 你的 LSP 配置（如 pyright/pylsp）放在这里
-            require("lspconfig").pyright.setup({
+            vim.lsp.config('pyright', {
                 capabilities = require('cmp_nvim_lsp').default_capabilities(),
                 settings = {
                     python = {
@@ -419,7 +419,7 @@ return {
                 },
             })
 
-            require("lspconfig").pylsp.setup({
+            vim.lsp.config('pylsp', {
                 capabilities = require('cmp_nvim_lsp').default_capabilities(),
                 settings = {
                     pyls = {
